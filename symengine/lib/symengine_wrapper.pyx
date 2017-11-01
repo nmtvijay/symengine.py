@@ -99,6 +99,8 @@ cdef c2py(RCP[const symengine.Basic] o):
         r = Function.__new__(Max)
     elif (symengine.is_a_Min(deref(o))):
         r = Function.__new__(Min)
+    elif (symengine.is_a_Heaviside(deref(o))):
+        r = Function.__new__(Heaviside)
     elif (symengine.is_a_BooleanAtom(deref(o))):
         if (deref(symengine.rcp_static_cast_BooleanAtom(o)).get_val()):
             return S.true
@@ -354,6 +356,8 @@ def sympy2symengine(a, raise_error=False):
         return log(a.args[0])
     elif isinstance(a, sympy.Abs):
         return abs(sympy2symengine(a.args[0], raise_error))
+    elif isinstance(a, sympy.Heaviside):
+        return Heaviside(a.args[0])
     elif isinstance(a, sympy.Max):
         return _max(*a.args)
     elif isinstance(a, sympy.Min):
@@ -2345,6 +2349,11 @@ class sign(OneArgFunction):
         cdef Basic X = sympify(x)
         return c2py(symengine.sign(X.thisptr))
 
+class heaviside(OneArgFunction):
+    def __new__(cls, x):
+        cdef Basic X = sympify(x)
+        return c2py(symengine.heaviside(X.thisptr))
+
 class floor(OneArgFunction):
     def __new__(cls, x):
         cdef Basic X = sympify(x)
@@ -2555,6 +2564,34 @@ class Abs(OneArgFunction):
         cdef RCP[const symengine.Abs] X = symengine.rcp_static_cast_Abs(self.thisptr)
         arg = c2py(deref(X).get_arg())._sage_()
         return abs(arg)
+
+    @property
+    def func(self):
+        return self.__class__
+
+class Heaviside(OneArgFunction):
+
+    @property
+    def is_real(self):
+        return True
+
+    @property
+    def is_negative(self):
+        return False
+
+    def __new__(cls, x):
+        cdef Basic X = sympify(x)
+        return c2py(symengine.heaviside(X.thisptr))
+
+    def _sympy_(Basic self):
+        cdef RCP[const symengine.Heaviside] X = symengine.rcp_static_cast_Heaviside(self.thisptr)
+        arg = c2py(deref(X).get_arg())._sympy_()
+        return Heaviside(arg)
+
+    def _sage_(Basic self):
+        cdef RCP[const symengine.Heaviside] X = symengine.rcp_static_cast_Heaviside(self.thisptr)
+        arg = c2py(deref(X).get_arg())._sage_()
+        return Heaviside(arg)
 
     @property
     def func(self):

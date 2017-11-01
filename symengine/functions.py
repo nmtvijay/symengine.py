@@ -6,5 +6,5 @@ from .lib.symengine_wrapper import (sin, cos, tan, cot, csc, sec,
     LambertW, zeta, dirichlet_eta,
     KroneckerDelta, LeviCivita, erf, erfc,
     lowergamma, uppergamma, loggamma, beta,
-    polygamma, sign, floor, ceiling, 
-    conjugate, digamma, trigamma)
+    polygamma, sign, floor, ceiling,
+    conjugate, digamma, trigamma, heaviside)
